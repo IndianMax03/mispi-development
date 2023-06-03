@@ -4,4 +4,3 @@ plugins {
 }
 
 rootProject.name = "WebLab3"
-//include("src")

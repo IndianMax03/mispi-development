@@ -1,13 +1,10 @@
 import org.apache.tools.ant.BuildException
 import org.apache.tools.ant.util.regexp.Regexp
 import org.w3c.dom.Document
-import java.util.*
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.validation.Validator
-import kotlin.math.log
-import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 repositories {
     mavenCentral()

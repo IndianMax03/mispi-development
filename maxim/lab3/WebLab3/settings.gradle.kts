@@ -3,5 +3,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "0.4.0"
 }
 
-rootProject.name = "mispi-lab3"
-include("WebLab3")
+rootProject.name = "WebLab3"

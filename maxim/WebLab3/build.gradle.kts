@@ -29,10 +29,13 @@ dependencies {
 
 /* Compile start */
 
-val compile = tasks.register("compile") {
+tasks.compileJava {
+    options.compilerArgs.add("-Xlint:unchecked")
+}
+
+val compile = tasks.register<JavaCompile>("compile"){
     group = project.property("tasksGroup").toString()
-    dependsOn(tasks.compileJava)
-    dependsOn(tasks.compileTestJava)
+    dependsOn(tasks.compileJava, tasks.compileTestJava)
 }
 
 /* Compile end */
@@ -152,7 +155,26 @@ val xml = tasks.register<Xml>("xml") {
 
 /* XML end */
 
+/* test start */
+
 tasks.test {
     group = project.property("tasksGroup").toString()
     useJUnit()
+    dependsOn(build)
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("testDirOutput"))
+        junitXml.outputLocation.set(layout.buildDirectory.dir("testDirOutput"))
+    }
 }
+
+/* test end */
+
+/* report start */
+
+val report = tasks.register("report") {
+    group = project.property("tasksGroup").toString()
+    dependsOn(tasks.test)
+}
+
+/* test end */

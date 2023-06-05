@@ -1,6 +1,5 @@
 package com.labs.weblab3;
 
-import static java.lang.Math.abs;
 import static java.lang.Math.pow;
 
 public class Validator {

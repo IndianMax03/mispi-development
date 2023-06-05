@@ -1,4 +1,5 @@
 import org.apache.tools.ant.BuildException
+import org.gradle.crypto.checksum.Checksum
 import org.w3c.dom.Document
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -7,6 +8,7 @@ import javax.xml.validation.Validator
 
 plugins {
     java
+    id("org.gradle.crypto.checksum") version "1.4.0"
 }
 
 group = "com.labs.weblab3"
@@ -24,6 +26,7 @@ dependencies {
     implementation("net.bootsfaces:bootsfaces:1.5.0")
     implementation("org.eclipse.persistence:eclipselink:3.0.3")
     implementation("jakarta.platform:jakarta.jakartaee-api:8.0.0")
+    implementation("org.mockito:mockito-inline:3.4.6")
     testImplementation("junit:junit:4.13.2")
 }
 
@@ -157,7 +160,7 @@ val xml = tasks.register<Xml>("xml") {
 
 /* test start */
 
-tasks.test {
+tasks.withType<Test>().configureEach {
     group = project.property("tasksGroup").toString()
     project.setProperty("testResultsDirName", "$buildDir/${project.property("testOutputDir").toString()}")
     useJUnit()

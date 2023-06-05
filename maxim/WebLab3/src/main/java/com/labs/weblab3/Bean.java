@@ -22,14 +22,14 @@ public class Bean implements Serializable  {
         loadEntries();
     }
     private void connection() {
-       entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
-       entityManager = entityManagerFactory.createEntityManager();
-       transaction = entityManager.getTransaction();
+        entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
+        entityManager = entityManagerFactory.createEntityManager();
+        transaction = entityManager.getTransaction();
     }
     private void loadEntries() {
         try {
             transaction.begin();
-            Query query = entityManager.createQuery("SELECT coordinates FROM Coordinates coordinates");
+            Query query = entityManager.createQuery("SELECT e FROM Coordinates e");
             entries = query.getResultList();
             transaction.commit();
         } catch (RuntimeException exception) {

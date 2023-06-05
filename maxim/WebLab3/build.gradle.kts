@@ -33,7 +33,7 @@ tasks.compileJava {
     options.compilerArgs.add("-Xlint:unchecked")
 }
 
-val compile = tasks.register<JavaCompile>("compile"){
+val compile = tasks.register("compile") {
     group = project.property("tasksGroup").toString()
     dependsOn(tasks.compileJava, tasks.compileTestJava)
 }
@@ -124,7 +124,7 @@ abstract class Xml : AbstractExecTask<Xml>(Xml::class.java) {
             }
         }
 
-        var failures : Set<String> = mutableSetOf()
+        var failures: Set<String> = mutableSetOf()
         val parser: DocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val validator: Validator? = null
         xmlFiles.forEach {
@@ -159,12 +159,13 @@ val xml = tasks.register<Xml>("xml") {
 
 tasks.test {
     group = project.property("tasksGroup").toString()
+    project.setProperty("testResultsDirName", "$buildDir/${project.property("testOutputDir").toString()}")
     useJUnit()
     dependsOn(build)
     reports {
         html.required.set(true)
-        html.outputLocation.set(layout.buildDirectory.dir("testDirOutput"))
-        junitXml.outputLocation.set(layout.buildDirectory.dir("testDirOutput"))
+        html.outputLocation.set(layout.buildDirectory.dir("${project.property("testOutputDir").toString()}/${project.property("testHtmlOutputDir").toString()}"))
+        junitXml.outputLocation.set(layout.buildDirectory.dir("${project.property("testOutputDir").toString()}/${project.property("testXmlOutputDir").toString()}"))
     }
 }
 
@@ -172,9 +173,25 @@ tasks.test {
 
 /* report start */
 
-val report = tasks.register("report") {
+tasks.register<TestReport>("report") {
     group = project.property("tasksGroup").toString()
     dependsOn(tasks.test)
+    //  todo сделать коммит
+    exec {
+        executable = "git"
+        args("status")
+    }
+    exec {
+        executable = "echo"
+        args("*******************************************")
+    }
+    exec {
+        executable = "git"
+        args("help")
+    }
+//    commandLine("git", "status")
+//    commandLine("git", "help")
 }
 
 /* test end */
+

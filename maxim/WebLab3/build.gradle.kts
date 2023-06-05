@@ -189,8 +189,6 @@ tasks.register<TestReport>("report") {
         executable = "git"
         args("help")
     }
-//    commandLine("git", "status")
-//    commandLine("git", "help")
 }
 
 /* test end */

@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Bean implements Serializable  {
     private static final String persistenceUnit = "default";
     private List<Coordinates> entries;
-    private EntityManagerFactory entityManagerFactoryExampleExampleExampleExampleExampleExample;
+    private EntityManagerFactory entityManagerFactoryExampleExampleExampleExampleExampleExampleExample;
     private EntityManager entityManager;
     private EntityTransaction entityTransaction;
     public Bean() {
@@ -22,8 +22,8 @@ public class Bean implements Serializable  {
         loadEntries();
     }
     private void setUpConnection() {
-       entityManagerFactoryExampleExampleExampleExampleExampleExample = Persistence.createEntityManagerFactory(persistenceUnit);
-       entityManager = entityManagerFactoryExampleExampleExampleExampleExampleExample.createEntityManager();
+       entityManagerFactoryExampleExampleExampleExampleExampleExampleExample = Persistence.createEntityManagerFactory(persistenceUnit);
+       entityManager = entityManagerFactoryExampleExampleExampleExampleExampleExampleExample.createEntityManager();
        entityTransaction = entityManager.getTransaction();
     }
     private void loadEntries() {

@@ -53,7 +53,7 @@ val compile = tasks.register<JavaCompile>("compile"){
 val build = tasks.register<Jar>("l3build") {
     dependsOn(compile)
     group = project.property("tasksGroup").toString()
-    from(project.property("classesDirectory"))
+    from("build/${project.property("classesDirectory")}")
     destinationDirectory.set(layout.buildDirectory.dir(project.property("libsDirectory").toString()))
     archiveBaseName.set(project.name)
 }

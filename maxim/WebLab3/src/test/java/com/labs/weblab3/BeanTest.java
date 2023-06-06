@@ -21,7 +21,7 @@ public class BeanTest {
     private final String queryString = "SELECT e FROM Coordinates e";
 
     @Mock
-    private EntityManagerFactory entityManagerFactoryExampleExampleExampleExample;
+    private EntityManagerFactory entityManagerFactoryExampleExampleExampleExampleExample;
     @Mock
     private EntityManager entityManager;
     @Mock
@@ -33,7 +33,7 @@ public class BeanTest {
     @Before
     public void init() {
         openMocks(this);
-        when(entityManagerFactoryExampleExampleExampleExample.createEntityManager()).thenReturn(entityManager);
+        when(entityManagerFactoryExampleExampleExampleExampleExample.createEntityManager()).thenReturn(entityManager);
         when(entityManager.getTransaction()).thenReturn(entityTransaction);
         when(entityManager.createQuery(queryString)).thenReturn(query);
     }
@@ -48,12 +48,12 @@ public class BeanTest {
 
         try (MockedStatic<Persistence> persistence = mockStatic(Persistence.class)) {
 
-            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExample);
+            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExampleExample);
 
             new Bean();
 
             persistence.verify(() -> Persistence.createEntityManagerFactory(persistenceUnit));
-            verify(entityManagerFactoryExampleExampleExampleExample, times(1)).createEntityManager();
+            verify(entityManagerFactoryExampleExampleExampleExampleExample, times(1)).createEntityManager();
             verify(entityManager, times(1)).getTransaction();
             verify(entityTransaction, times(1)).begin();
             verify(entityManager, times(1)).createQuery(queryString);
@@ -73,7 +73,7 @@ public class BeanTest {
 
         try (MockedStatic<Persistence> persistence = mockStatic(Persistence.class)) {
 
-            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExample);
+            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExampleExample);
             when(query.getResultList()).thenThrow(RuntimeException.class);
 
             new Bean();
@@ -92,7 +92,7 @@ public class BeanTest {
 
         try (MockedStatic<Persistence> persistence = mockStatic(Persistence.class)) {
 
-            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExample);
+            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExampleExample);
             when(query.getResultList()).thenThrow(RuntimeException.class);
             when(entityTransaction.isActive()).thenReturn(true);
 
@@ -117,7 +117,7 @@ public class BeanTest {
 
         try (MockedStatic<Persistence> persistence = mockStatic(Persistence.class)) {
 
-            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExample);
+            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExampleExample);
             when(query.getResultList()).thenThrow(RuntimeException.class);
             when(entityTransaction.isActive()).thenReturn(false);
 
@@ -147,7 +147,7 @@ public class BeanTest {
 
         try (MockedStatic<Persistence> persistence = mockStatic(Persistence.class)) {
 
-            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExample);
+            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExampleExample);
 
             Bean bean = new Bean();
 
@@ -178,7 +178,7 @@ public class BeanTest {
 
         try (MockedStatic<Persistence> persistence = mockStatic(Persistence.class)) {
 
-            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExample);
+            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExampleExample);
 
             Bean bean = new Bean();
 
@@ -207,7 +207,7 @@ public class BeanTest {
 
         try (MockedStatic<Persistence> persistence = mockStatic(Persistence.class)) {
 
-            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExample);
+            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExampleExample);
             doThrow(RuntimeException.class).when(entityManager).persist(coordinates);
             when(entityTransaction.isActive()).thenReturn(true);
 
@@ -238,7 +238,7 @@ public class BeanTest {
 
         try (MockedStatic<Persistence> persistence = mockStatic(Persistence.class)) {
 
-            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExample);
+            persistence.when(() -> Persistence.createEntityManagerFactory(persistenceUnit)).thenReturn(entityManagerFactoryExampleExampleExampleExampleExample);
             doThrow(RuntimeException.class).when(entityManager).persist(coordinates);
             when(entityTransaction.isActive()).thenReturn(false);
 

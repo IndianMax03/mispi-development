@@ -1,0 +1,5 @@
+src/main/java/com/labs/weblab3/Bean.java
+src/main/java/com/labs/weblab3/Coordinates.java
+src/main/java/com/labs/weblab3/Validator.java
+src/test/java/com/labs/weblab3/BeanTest.java
+src/test/java/com/labs/weblab3/ValidatorTest.java

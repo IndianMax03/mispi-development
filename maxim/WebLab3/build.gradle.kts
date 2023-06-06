@@ -172,183 +172,6 @@ tasks.withType<Test>().configureEach {
 
 /* test end */
 
-/* clean start */
-
-tasks.clean {
-    group = project.property("tasksGroup").toString()
-    delete(buildDir)
-}
-
-/* clean end */
-
-/* native2ascii start */
-
-abstract class Native2ascii : AbstractExecTask<Native2ascii>(Native2ascii::class.java) {
-
-    @get:SkipWhenEmpty
-    @get:InputDirectory
-    abstract val sourceDirectory: DirectoryProperty
-
-    @get:OutputDirectory
-    abstract val outputDirectory: DirectoryProperty
-
-    init {
-        group = project.property("tasksGroup").toString()
-    }
-
-    override fun exec() {
-
-        val files = sourceDirectory.asFileTree.map { it }
-        val propertiesFiles = mutableListOf<File>()
-        val reg = """.*\.properties""".toRegex()
-
-        files.forEach {
-            if (it.path.matches(reg)) {
-                propertiesFiles.add(it)
-            }
-        }
-
-        propertiesFiles.forEach {
-
-            println(it)
-            println(outputDirectory.asFile.get().path.toString())
-
-            executable = "native2ascii"
-
-            args(listOf("-encoding", "8859_1", it.path, "${outputDirectory.asFile.get().path}\\${it.name}"))
-
-            super.exec()
-
-        }
-    }
-}
-
-val native2ascii = tasks.register<Native2ascii>("native2ascii") {
-    sourceDirectory.set(layout.projectDirectory.dir(project.property("sourceMainDirectory").toString()).dir("resources"))
-    outputDirectory.set(layout.projectDirectory.dir(project.property("sourceMainDirectory").toString()).dir("resources").dir("native2ascii"))
-}
-
-/* native2ascii end */
-
-
-/* doc start */
-
-val doc = tasks.register<Checksum>("doc") {
-    group = project.property("tasksGroup").toString()
-
-    dependsOn(build)
-
-    doFirst {
-        docSecond
-    }
-
-    inputFiles.setFrom(layout.buildDirectory.dir(project.property("classesDirectory").toString()))
-
-    checksumAlgorithm.set(Checksum.Algorithm.MD5)
-
-    outputDirectory.set(layout.buildDirectory.dir("tmp\\l3build\\md5"))
-
-    finalizedBy(tasks.javadoc)
-
-    doLast {
-
-        val files = outputDirectory.asFileTree.map { it }
-        val propertiesFiles = mutableListOf<File>()
-        val reg = """.*\.(md5|sha512)""".toRegex()
-
-        files.forEach {
-            if (it.path.matches(reg)) {
-                propertiesFiles.add(it)
-            }
-        }
-
-        propertiesFiles.forEach {
-
-            println(it.name)
-
-            ant.withGroovyBuilder {
-                "echo" ("message" to "Name: ${it.name}\nDigest-Algorithms: ${checksumAlgorithm.get()}\nMD5-Digest: ${it.readText()}\n\n",
-                        "file" to "build/tmp/l3build/MANIFEST.MF",
-                        "append" to "true"
-                )
-            }
-        }
-    }
-}
-
-val docSecond = tasks.register<Checksum>("docSecond") {
-
-    dependsOn(build)
-
-    inputFiles.setFrom(layout.buildDirectory.dir(project.property("classesDirectory").toString()))
-
-    checksumAlgorithm.set(Checksum.Algorithm.SHA512)
-
-    outputDirectory.set(layout.buildDirectory.dir("tmp\\l3build\\sha512"))
-
-}
-
-tasks.javadoc {
-    group = project.property("tasksGroup").toString()
-
-    source = sourceSets.main.get().java.asFileTree
-    setDestinationDir(file("build/tmp/l3build/javadoc"))
-}
-
-/* doc end */
-
-/* alt */
-
-val copyAltToMain = tasks.register<Copy>("copyAltToMain") {
-    from(layout.projectDirectory.dir(project.property("sourceDirectory").toString()))
-    into(layout.projectDirectory.dir(project.property("tmpDirectory").toString()))
-    filter {
-        line -> line
-            .replace(project.property("startedEntityManagerName").toString(), project.property("replacedEntityManagerName").toString())
-            .replace(project.property("startedConnectionName").toString(), project.property("replacedConnectionName").toString())
-            .replace(project.property("startedTransactionName").toString(), project.property("replacedTransactionName").toString())
-
-    }
-
-    finalizedBy(overwriteFilesInSrcfromAlt)
-
-}
-
-val deleteAlt = tasks.register<Delete>("deleteAlt") {
-    delete(layout.projectDirectory.dir(project.property("tmpDirectory").toString()))
-}
-
-val overwriteFilesInSrcfromAlt = tasks.register<Copy>("overwriteFilesInSrcfromAlt") {
-
-    from(layout.projectDirectory.dir(project.property("tmpDirectory").toString()))
-    into(layout.projectDirectory.dir(project.property("sourceDirectory").toString()))
-
-    dependsOn(compile)
-
-}
-
-val customBuild = tasks.register<Jar>("customBuild") {
-    dependsOn(compile)
-    from(layout.projectDirectory.dir(project.property("tmpDirectory").toString()))
-    destinationDirectory.set(layout.buildDirectory.dir(project.property("libsDirectory").toString()))
-    archiveBaseName.set("changedArchive")
-    finalizedBy(deleteAlt)
-}
-
-val alt = tasks.register("alt") {
-    group = project.property("tasksGroup").toString()
-
-    shouldRunAfter(tasks.clean)
-
-    dependsOn(copyAltToMain)
-
-    tasks.clean
-
-    finalizedBy(customBuild)
-}
-
-/* alt */
-
 /* report start */
 
 tasks.register("report") {
@@ -462,9 +285,7 @@ tasks.register("env") {
 
 tasks.register("diff") {
     group = project.property("tasksGroup").toString()
-
     doLast {
-
         ant.withGroovyBuilder {
             "exec"("executable" to "git", "failonerror" to "true", "output" to "statusFile.txt") {
                 "arg"("value" to "status")
@@ -516,4 +337,114 @@ tasks.register("diff") {
 
         }
     }
+}
+
+tasks.register("history") {
+    group = project.property("tasksGroup").toString()
+
+    doLast {
+        ant.withGroovyBuilder {
+            "echo"("message" to "Прячу изменения...")
+            "exec"("executable" to "git", "failonerror" to "false") {
+                "arg"("value" to "stash")
+            }
+            "echo"("message" to "Проверяю количество коммитов")
+            "exec"("executable" to "git", "failonerror" to "true", "output" to "logInfo.txt") {
+                "arg"("value" to "rev-list")
+                "arg"("value" to "--count")
+                "arg"("value" to "--all")
+            }
+        }
+
+        var commits: Int = 0
+
+        File("logInfo.txt").useLines {
+            commits = Integer.parseInt(it.firstOrNull())
+        }
+
+        ant.withGroovyBuilder {
+            "exec"("executable" to "rm", "failonerror" to "false") {
+                "arg"("value" to "logInfo.txt")
+            }
+        }
+
+        ant.withGroovyBuilder { "echo"("message" to "Начинаю цикл поиска валидной сборки...") }
+        for (i in 0..commits) {
+            ant.withGroovyBuilder {
+                "echo"("message" to "Откатываю src/")
+                "exec"("executable" to "git", "failonerror" to "false") {
+                    "arg"("value" to "checkout")
+                    "arg"("value" to "HEAD~${i}")
+                    "arg"("value" to "--")
+                    "arg"("value" to "${layout.projectDirectory.dir(project.property("sourceDirectory").toString()).toString()}")
+                }
+                "echo"("message" to "Компилирую...")
+                "exec"("executable" to "gradle", "failonerror" to "false", "output" to "buildResult.txt") {
+                    "arg"("value" to "compile")
+                }
+                if (i != 0) {
+                    "echo"("message" to "Возвращаю src/")
+                    "exec"("executable" to "git", "failonerror" to "false") {
+                        "arg"("value" to "checkout")
+                        "arg"("value" to "-")
+                        "arg"("value" to "--")
+                        "arg"("value" to "${layout.projectDirectory.dir(project.property("sourceDirectory").toString()).toString()}")
+                    }
+                }
+            }
+
+            var isSuccessfull: Boolean = false
+
+            File("buildResult.txt").forEachLine {
+                if (it.toString().startsWith("BUILD SUCCESSFUL")) isSuccessfull = true
+            }
+            ant.withGroovyBuilder {
+                "exec"("executable" to "rm", "failonerror" to "false") {
+                    "arg"("value" to "buildResult.txt")
+                }
+            }
+
+            if (isSuccessfull) {
+                ant.withGroovyBuilder {
+                    "echo"("message" to "Найдена рабочая версия!")
+                }
+                if (i == 0) {
+                    ant.withGroovyBuilder { "echo"("message" to "Она ведь текущая!!!") }
+                    break
+                }
+                ant.withGroovyBuilder {
+                    "echo"("message" to "Формирую файл с косяками!")
+                    "echo"("message" to "Иду в прошлое")
+                    "exec"("executable" to "git", "failonerror" to "true") {
+                        "arg"("value" to "checkout")
+                        "arg"("value" to "HEAD~${i - 1}")
+                    }
+                    "exec"("executable" to "mkdir", "failonerror" to "false") {
+                        "arg"("value" to "${layout.projectDirectory.asFile.path.toString()}/history")
+                    }
+                    "echo"("message" to "Выполняю git diff")
+                    "exec"("executable" to "git", "failonerror" to "false", "output" to "${layout.projectDirectory.asFile.path.toString()}/history/diffResult.txt") {
+                        "arg"("value" to "diff")
+                        "arg"("value" to "HEAD~${i}")
+                        "arg"("value" to "HEAD~${i - 1}")
+                    }
+                    "echo"("message" to "Возвращаюсь в настоящее")
+                    "exec"("executable" to "git", "failonerror" to "true") {
+                        "arg"("value" to "checkout")
+                        "arg"("value" to "-")
+                    }
+
+                }
+                break
+            }
+        }
+        ant.withGroovyBuilder {
+            "echo"("message" to "Возвращаю то, что вы не припрятали!")
+            "exec"("executable" to "git", "failonerror" to "false") {
+                "arg"("value" to "stash")
+                "arg"("value" to "apply")
+            }
+        }
+    }
+
 }

@@ -12,29 +12,29 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Bean implements Serializable  {
     private static final String persistenceUnit = "default";
     private List<Coordinates> entries;
-    private EntityManagerFactory entityManagerFactory;
+    private EntityManagerFactory entityManagerFactoryExampleExampleExampleExampleExampleExample;
     private EntityManager entityManager;
-    private EntityTransaction transaction;
+    private EntityTransaction entityTransaction;
     public Bean() {
         entries = new CopyOnWriteArrayList<>();
 
-        connection();
+        setUpConnection();
         loadEntries();
     }
-    private void connection() {
-       entityManagerFactory = Persistence.createEntityManagerFactory(persistenceUnit);
-       entityManager = entityManagerFactory.createEntityManager();
-       transaction = entityManager.getTransaction();
+    private void setUpConnection() {
+       entityManagerFactoryExampleExampleExampleExampleExampleExample = Persistence.createEntityManagerFactory(persistenceUnit);
+       entityManager = entityManagerFactoryExampleExampleExampleExampleExampleExample.createEntityManager();
+       entityTransaction = entityManager.getTransaction();
     }
     private void loadEntries() {
         try {
-            transaction.begin();
+            entityTransaction.begin();
             Query query = entityManager.createQuery("SELECT coordinates FROM Coordinates coordinates");
             entries = query.getResultList();
-            transaction.commit();
+            entityTransaction.commit();
         } catch (RuntimeException exception) {
-            if (transaction.isActive()) {
-                transaction.rollback();
+            if (entityTransaction.isActive()) {
+                entityTransaction.rollback();
             }
             throw exception;
         }
@@ -42,16 +42,16 @@ public class Bean implements Serializable  {
     }
     public void addEntry(Coordinates coordinates) {
         try {
-            transaction.begin();
+            entityTransaction.begin();
             Validator validator = new Validator();
             setValidatorValues(validator, coordinates);
             coordinates.setHitResult(validator.getHitResult());
             entityManager.persist(coordinates);
             entries.add(coordinates);
-            transaction.commit();
+            entityTransaction.commit();
         } catch (RuntimeException exception) {
-            if (transaction.isActive()) {
-                transaction.rollback();
+            if (entityTransaction.isActive()) {
+                entityTransaction.rollback();
             }
             throw exception;
         }

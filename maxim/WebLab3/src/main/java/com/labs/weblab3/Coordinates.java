@@ -13,10 +13,14 @@ public class Coordinates {
     private Double yValue;
     private Double rValue;
     private String hitResult;
-    public Coordinates(){}
+
+    public Coordinates() {
+    }
+
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }

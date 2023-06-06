@@ -1,0 +1,7 @@
+<!--<project>-->
+<!--    <target name="alt" depends="copyAltToMain">-->
+<!--        <exec executable="gradle">-->
+<!--            <arg value="build"/>-->
+<!--        </exec>-->
+<!--    </target>-->
+<!--</project>-->

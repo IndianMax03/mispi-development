@@ -1,7 +1,6 @@
+
 import org.apache.tools.ant.BuildException
 import org.gradle.crypto.checksum.Checksum
-import org.gradle.internal.impldep.com.google.api.client.util.Data
-import org.gradle.internal.impldep.org.joda.time.LocalDate
 import org.w3c.dom.Document
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -486,9 +485,6 @@ abstract class Native2ascii : AbstractExecTask<Native2ascii>(Native2ascii::class
 
         propertiesFiles.forEach {
 
-            println(it)
-            println(outputDirectory.asFile.get().path.toString())
-
             executable = "native2ascii"
 
             args(listOf("-encoding", "8859_1", it.path, "${outputDirectory.asFile.get().path}\\${it.name}"))
@@ -500,6 +496,7 @@ abstract class Native2ascii : AbstractExecTask<Native2ascii>(Native2ascii::class
 }
 
 val native2ascii = tasks.register<Native2ascii>("native2ascii") {
+    delete(layout.projectDirectory.dir(project.property("sourceMainDirectory").toString()).dir("resources").dir("native2ascii"))
     sourceDirectory.set(layout.projectDirectory.dir(project.property("sourceMainDirectory").toString()).dir("resources"))
     outputDirectory.set(layout.projectDirectory.dir(project.property("sourceMainDirectory").toString()).dir("resources").dir("native2ascii"))
 }
@@ -509,14 +506,7 @@ val native2ascii = tasks.register<Native2ascii>("native2ascii") {
 
 /* doc start */
 
-val doc = tasks.register<Checksum>("doc") {
-    group = project.property("tasksGroup").toString()
-
-    dependsOn(build)
-
-    doFirst {
-        docSecond
-    }
+val docSecond = tasks.register<Checksum>("docSecond") {
 
     inputFiles.setFrom(layout.buildDirectory.dir(project.property("classesDirectory").toString()))
 
@@ -529,21 +519,21 @@ val doc = tasks.register<Checksum>("doc") {
     doLast {
 
         val files = outputDirectory.asFileTree.map { it }
-        val propertiesFiles = mutableListOf<File>()
-        val reg = """.*\.(md5|sha512)""".toRegex()
+        val propertiesFilesMd5 = mutableListOf<File>()
+        val regMd5 = """.*\.md5""".toRegex()
 
         files.forEach {
-            if (it.path.matches(reg)) {
-                propertiesFiles.add(it)
+            if (it.path.matches(regMd5)) {
+                propertiesFilesMd5.add(it)
             }
         }
 
-        propertiesFiles.forEach {
-
-            println(it.name)
+        for (i in 0 .. propertiesFilesMd5.size - 1) {
 
             ant.withGroovyBuilder {
-                "echo" ("message" to "Name: ${it.name}\nDigest-Algorithms: ${checksumAlgorithm.get()}\nMD5-Digest: ${it.readText()}\n\n",
+                "echo" ("message" to "Name: ${propertiesFilesMd5[i].name}\nDigest-Algorithms: ${checksumAlgorithm.get()}\nMD5-Digest: ${propertiesFilesMd5[i].readText()}\n"
+                        + "\n"
+                    ,
                     "file" to "build/tmp/l3build/MANIFEST.MF",
                     "append" to "true"
                 )
@@ -552,7 +542,8 @@ val doc = tasks.register<Checksum>("doc") {
     }
 }
 
-val docSecond = tasks.register<Checksum>("docSecond") {
+val doc = tasks.register<Checksum>("doc") {
+    group = project.property("tasksGroup").toString()
 
     dependsOn(build)
 
@@ -561,6 +552,32 @@ val docSecond = tasks.register<Checksum>("docSecond") {
     checksumAlgorithm.set(Checksum.Algorithm.SHA512)
 
     outputDirectory.set(layout.buildDirectory.dir("tmp\\l3build\\sha512"))
+
+    finalizedBy(docSecond)
+
+    doLast {
+        val files = outputDirectory.asFileTree.map { it }
+        val propertiesFilesSha512 = mutableListOf<File>()
+        val regSha512 = """.*\.sha512""".toRegex()
+
+        files.forEach {
+            if (it.path.matches(regSha512)) {
+                propertiesFilesSha512.add(it)
+            }
+        }
+
+        for (i in 0 .. propertiesFilesSha512.size - 1) {
+
+            ant.withGroovyBuilder {
+                "echo" ("message" to "Name: ${propertiesFilesSha512[i].name}\nDigest-Algorithms: ${checksumAlgorithm.get()}\n"
+                        + "SHA512-Digest: ${propertiesFilesSha512[i].readText()}\n\n"
+                    ,
+                    "file" to "build/tmp/l3build/MANIFEST.MF",
+                    "append" to "true"
+                )
+            }
+        }
+    }
 
 }
 

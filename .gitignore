@@ -1,4 +1,7 @@
 **/.idea
 **/.DS_Store
-maxim/WebLab3/.*
-maxim/WebLab3/build/
+projectFiles/WebLab3/.*
+projectFiles/WebLab3/build/
+igor/
+projectFiles/NOTES.MD
+projectFiles/WebLab3/.gradle
